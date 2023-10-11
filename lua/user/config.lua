@@ -49,6 +49,22 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- Move a line up or down (like in vscode or sublime)
+vim.keymap.set({ 'n' }, "<C-S-up>",   ':m.-2<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-k>",    ':m.-2<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-j>",    ':m.+1<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-down>", ':m.+1<cr>==')
+
+vim.keymap.set({ 'i' }, "<C-S-up>",   '<esc>:m .-2<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-k>",    '<esc>:m .-2<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-down>", '<esc>:m .+1<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-j>",    '<esc>:m .+1<cr>==gi')
+
+vim.keymap.set({ 'v' }, "<C-S-up>",   ":m '<-2<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-k>",    ":m '<-2<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-down>", ":m '>+1<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-j>",    ":m '>+1<cr>gv=gv")
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
