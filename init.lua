@@ -201,11 +201,22 @@ require('lazy').setup({
     config = function()
       -- Default options:
       require('kanagawa').setup({
-        compile = true,              -- enable compiling the colorscheme
+        compile = true,
+        colors = {
+          palette = {
+            sumiInk0 = "#0d0c0c",
+            sumiInk1 = "#12120f",
+            sumiInk2 = "#1D1C19",
+            sumiInk3 = "#181616",
+            sumiInk4 = "#282727",
+            sumiInk5 = "#393836",
+            sumiInk6 = "#625e5a",
+          }
+        }
       })
 
       -- setup must be called before loading
-      vim.cmd("colorscheme kanagawa-dragon")
+      vim.cmd("colorscheme kanagawa-wave")
     end,
   }
 }, {})
