@@ -1,42 +1,3 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-
-Kickstart.nvim is *not* a distribution.
-
-Kickstart.nvim is a template for your own configuration.
-  The goal is that you can read every line of code, top-to-bottom, understand
-  what your configuration is doing, and modify it to suit your needs.
-
-  Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
-
-  If you don't know anything about Lua, I recommend taking some time to read through
-  a guide. One possible example:
-  - https://learnxinyminutes.com/docs/lua/
-
-
-  And then you can explore or search through `:help lua-guide`
-  - https://neovim.io/doc/user/lua-guide.html
-
-
-Kickstart Guide:
-
-I have left several `:help X` comments throughout the init.lua
-You should run that command and read that help section for more information.
-
-In addition, I have some `NOTE:` items throughout the file.
-These are for you, the reader to help understand what is happening. Feel free to delete
-them once you know what you're doing, but they should serve as a guide for when you
-are first encountering a few different constructs in your nvim config.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now :)
---]]
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -206,16 +167,130 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  { import = 'custom.plugins' },
+  {
+    "windwp/nvim-autopairs",
+    -- Optional dependency
+    dependencies = { 'hrsh7th/nvim-cmp' },
+    config = function()
+      require("nvim-autopairs").setup {}
+      -- If you want to automatically add `(` after selecting a function or method
+      local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+      local cmp = require('cmp')
+      cmp.event:on(
+        'confirm_done',
+        cmp_autopairs.on_confirm_done()
+      )
+    end,
+  },
+
+  {
+    'lukas-reineke/indent-blankline.nvim',
+    config = function()
+      require('ibl').setup({
+        indent = { char = "┊" },
+        scope = {
+          show_start = false,
+          show_end = false,
+        }
+      })
+    end
+  },
+
+  {
+    'rebelot/kanagawa.nvim',
+    config = function()
+      -- Default options:
+      require('kanagawa').setup({
+        compile = true,              -- enable compiling the colorscheme
+      })
+
+      -- setup must be called before loading
+      vim.cmd("colorscheme kanagawa-dragon")
+    end,
+  }
 }, {})
 
-require("user.config")
+-- [[ Setting options ]]
+-- See `:help vim.o`
+-- NOTE: You can change these options as you wish!
+
+-- Set highlight on search
+vim.o.hlsearch = false
+
+-- Make line numbers default
+vim.wo.number = true
+
+-- Enable mouse mode
+vim.o.mouse = 'a'
+
+-- Sync clipboard between OS and Neovim.
+--  Remove this option if you want your OS clipboard to remain independent.
+--  See `:help 'clipboard'`
+vim.o.clipboard = 'unnamedplus'
+
+-- Enable break indent
+vim.o.breakindent = true
+
+-- Save undo history
+vim.o.undofile = true
+
+-- Case-insensitive searching UNLESS \C or capital in search
+vim.o.ignorecase = true
+vim.o.smartcase = true
+
+-- Keep signcolumn on by default
+vim.wo.signcolumn = 'yes'
+
+-- Decrease update time
+vim.o.updatetime = 250
+vim.o.timeoutlen = 300
+
+-- Set completeopt to have a better completion experience
+vim.o.completeopt = 'menuone,noselect'
+
+-- NOTE: You should make sure your terminal supports this
+vim.o.termguicolors = true
+
+-- [[ Basic Keymaps ]]
+
+-- Keymaps for better default experience
+-- See `:help vim.keymap.set()`
+vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+
+-- Remap for dealing with word wrap
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Move a line up or down (like in vscode or sublime)
+vim.keymap.set({ 'n' }, "<C-S-up>",   ':m.-2<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-k>",    ':m.-2<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-j>",    ':m.+1<cr>==')
+vim.keymap.set({ 'n' }, "<C-S-down>", ':m.+1<cr>==')
+
+vim.keymap.set({ 'i' }, "<C-S-up>",   '<esc>:m .-2<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-k>",    '<esc>:m .-2<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-down>", '<esc>:m .+1<cr>==gi')
+vim.keymap.set({ 'i' }, "<C-S-j>",    '<esc>:m .+1<cr>==gi')
+
+vim.keymap.set({ 'v' }, "<C-S-up>",   ":m '<-2<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-k>",    ":m '<-2<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-down>", ":m '>+1<cr>gv=gv")
+vim.keymap.set({ 'v' }, "<C-S-j>",    ":m '>+1<cr>gv=gv")
+
+-- [[ Highlight on yank ]]
+-- See `:help vim.highlight.on_yank()`
+local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
+vim.api.nvim_create_autocmd('TextYankPost', {
+	callback = function()
+		vim.highlight.on_yank()
+	end,
+	group = highlight_group,
+	pattern = '*',
+})
+
+-- Indent width
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
 
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
@@ -397,6 +472,7 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
+  clangd = {},
   rust_analyzer = {},
   lua_ls = {
     Lua = {
